@@ -17,7 +17,7 @@
     <packaging>jar</packaging>
 
     <name>Taller Final Spring Boot</name>
-    <description>Sistema CRUD con Spring Boot - Parte 1 Sin Seguridad</description>
+    <description>Sistema CRUD con Spring Boot - Parte 2 Con Apache Shiro</description>
 
     <properties>
         <java.version>17</java.version>
@@ -57,14 +57,37 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Apache Shiro se agregará en Parte 2 -->
-        <!-- 
+        <!-- Apache Shiro Dependencies -  -->
         <dependency>
             <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-spring-boot-web-starter</artifactId>
-            <version>2.0.0</version>
+            <artifactId>shiro-core</artifactId>
+            <version>1.13.0</version>
         </dependency>
-        -->
+
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-web</artifactId>
+            <version>1.13.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-spring</artifactId>
+            <version>1.13.0</version>
+        </dependency>
+
+        <!-- Dependencias de compatibilidad Jakarta/Javax -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+        </dependency>
+
+        <!-- Javax Servlet API for Apache Shiro compatibility -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
         <!-- Spring Boot Test -->
         <dependency>
