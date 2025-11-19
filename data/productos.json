@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "nombre": "lebrom",
+    "descripcion": "zapatillas avanzadas",
+    "precio": 3000000.0,
+    "stock": 4,
+    "categoria": "daportiva",
+    "fechaCreacion": "2025-11-19"
+  }
+]
