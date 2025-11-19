@@ -1,140 +1,151 @@
 package co.edu.uptc.service;
 
-import co.edu.uptc.model.Producto;
+import co.edu.uptc.entity.Producto;
 import co.edu.uptc.repository.ProductoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Servicio que contiene la lógica de negocio para productos
- * Aquí se aplican validaciones y reglas de negocio
+ * Servicio para gestión de productos usando Spring Boot
+ * Contiene la lógica de negocio y validaciones
  */
+@Service
+@Transactional
 public class ProductoService {
-    private ProductoRepository repository;
 
-    public ProductoService() {
-        this.repository = new ProductoRepository();
-    }
+    @Autowired
+    private ProductoRepository productoRepository;
 
     /**
-     * CREAR un nuevo producto con validaciones
+     * CREAR - Crear un nuevo producto
      */
     public Producto crearProducto(Producto producto) {
-        // Validar datos del producto
-        validarProducto(producto);
-
-        // Limpiar y formatear datos
-        producto.setNombre(producto.getNombre().trim());
-        if (producto.getDescripcion() != null) {
-            producto.setDescripcion(producto.getDescripcion().trim());
-        }
-        if (producto.getCategoria() != null) {
-            producto.setCategoria(producto.getCategoria().trim());
+        // Validar que no exista un producto con el mismo nombre
+        if (productoRepository.existsByNombreIgnoreCase(producto.getNombre())) {
+            throw new IllegalArgumentException("Ya existe un producto con el nombre: " + producto.getNombre());
         }
 
-        return repository.crear(producto);
+        return productoRepository.save(producto);
     }
 
     /**
-     * OBTENER todos los productos
+     * LEER - Obtener todos los productos
      */
+    @Transactional(readOnly = true)
     public List<Producto> obtenerTodosLosProductos() {
-        return repository.obtenerTodos();
+        return productoRepository.findAll();
     }
 
     /**
-     * BUSCAR producto por ID
+     * LEER - Buscar producto por ID
      */
+    @Transactional(readOnly = true)
     public Optional<Producto> buscarProductoPorId(Long id) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("El ID debe ser un número positivo");
-        }
-        return repository.buscarPorId(id);
+        return productoRepository.findById(id);
     }
 
     /**
-     * ACTUALIZAR un producto existente
+     * ACTUALIZAR - Actualizar un producto existente
      */
-    public Producto actualizarProducto(Long id, Producto producto) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("El ID debe ser un número positivo");
-        }
+    public Producto actualizarProducto(Long id, Producto productoActualizado) {
+        return productoRepository.findById(id)
+                .map(producto -> {
+                    // Verificar nombre único (excluyendo el producto actual)
+                    if (!producto.getNombre().equalsIgnoreCase(productoActualizado.getNombre()) &&
+                            productoRepository.existsByNombreIgnoreCase(productoActualizado.getNombre())) {
+                        throw new IllegalArgumentException(
+                                "Ya existe otro producto con el nombre: " + productoActualizado.getNombre());
+                    }
 
-        // Verificar que el producto existe
-        Optional<Producto> productoExistente = repository.buscarPorId(id);
-        if (productoExistente.isEmpty()) {
+                    // Actualizar campos
+                    producto.setNombre(productoActualizado.getNombre());
+                    producto.setDescripcion(productoActualizado.getDescripcion());
+                    producto.setPrecio(productoActualizado.getPrecio());
+                    producto.setStock(productoActualizado.getStock());
+                    producto.setCategoria(productoActualizado.getCategoria());
+
+                    return productoRepository.save(producto);
+                })
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con ID: " + id));
+    }
+
+    /**
+     * ELIMINAR - Eliminar un producto por ID
+     */
+    public void eliminarProducto(Long id) {
+        if (!productoRepository.existsById(id)) {
             throw new IllegalArgumentException("Producto no encontrado con ID: " + id);
         }
-
-        // Validar nuevos datos
-        validarProducto(producto);
-
-        // Mantener el ID y fecha de creación original
-        producto.setId(id);
-        producto.setFechaCreacion(productoExistente.get().getFechaCreacion());
-
-        // Limpiar datos
-        producto.setNombre(producto.getNombre().trim());
-        if (producto.getDescripcion() != null) {
-            producto.setDescripcion(producto.getDescripcion().trim());
-        }
-        if (producto.getCategoria() != null) {
-            producto.setCategoria(producto.getCategoria().trim());
-        }
-
-        return repository.actualizar(producto);
+        productoRepository.deleteById(id);
     }
 
     /**
-     * ELIMINAR un producto
+     * BUSCAR - Buscar productos por nombre
      */
-    public boolean eliminarProducto(Long id) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("El ID debe ser un número positivo");
-        }
-
-        // Verificar que el producto existe
-        Optional<Producto> producto = repository.buscarPorId(id);
-        if (producto.isEmpty()) {
-            throw new IllegalArgumentException("Producto no encontrado con ID: " + id);
-        }
-
-        return repository.eliminar(id);
-    }
-
-    /**
-     * BUSCAR productos por nombre
-     */
+    @Transactional(readOnly = true)
     public List<Producto> buscarPorNombre(String nombre) {
-        if (nombre == null || nombre.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre no puede estar vacío");
-        }
-        return repository.buscarPorNombre(nombre.trim());
+        return productoRepository.findByNombreContainingIgnoreCase(nombre);
     }
 
     /**
-     * Método privado para validar un producto
+     * BUSCAR - Buscar productos por categoría
      */
-    private void validarProducto(Producto producto) {
-        if (producto == null) {
-            throw new IllegalArgumentException("El producto no puede ser nulo");
-        }
+    @Transactional(readOnly = true)
+    public List<Producto> buscarPorCategoria(String categoria) {
+        return productoRepository.findByCategoriaIgnoreCase(categoria);
+    }
 
-        if (producto.getNombre() == null || producto.getNombre().trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre es obligatorio");
-        }
+    /**
+     * BUSCAR - Buscar productos por rango de precio
+     */
+    @Transactional(readOnly = true)
+    public List<Producto> buscarPorRangoPrecio(BigDecimal precioMin, BigDecimal precioMax) {
+        return productoRepository.findByPrecioBetween(precioMin, precioMax);
+    }
 
-        if (producto.getNombre().length() > 100) {
-            throw new IllegalArgumentException("El nombre no puede tener más de 100 caracteres");
-        }
+    /**
+     * ESTADÍSTICAS - Obtener productos con stock bajo
+     */
+    @Transactional(readOnly = true)
+    public List<Producto> obtenerProductosStockBajo(Integer stockMinimo) {
+        return productoRepository.findProductosConStockBajo(stockMinimo);
+    }
 
-        if (producto.getPrecio() == null || producto.getPrecio() < 0) {
-            throw new IllegalArgumentException("El precio debe ser mayor o igual a 0");
-        }
+    /**
+     * ESTADÍSTICAS - Calcular valor total del inventario
+     */
+    @Transactional(readOnly = true)
+    public BigDecimal calcularValorInventario() {
+        BigDecimal valor = productoRepository.calcularValorTotalInventario();
+        return valor != null ? valor : BigDecimal.ZERO;
+    }
 
-        if (producto.getStock() == null || producto.getStock() < 0) {
-            throw new IllegalArgumentException("El stock debe ser mayor o igual a 0");
-        }
+    /**
+     * ESTADÍSTICAS - Contar productos por categoría
+     */
+    @Transactional(readOnly = true)
+    public Long contarPorCategoria(String categoria) {
+        return productoRepository.countByCategoria(categoria);
+    }
+
+    /**
+     * UTILIDAD - Verificar si un producto existe
+     */
+    @Transactional(readOnly = true)
+    public boolean existeProducto(Long id) {
+        return productoRepository.existsById(id);
+    }
+
+    /**
+     * UTILIDAD - Obtener total de productos
+     */
+    @Transactional(readOnly = true)
+    public long contarTotalProductos() {
+        return productoRepository.count();
     }
 }
