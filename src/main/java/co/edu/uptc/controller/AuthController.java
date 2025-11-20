@@ -118,13 +118,35 @@ public class AuthController {
     /**
      * Procesa el logout del usuario usando Apache Shiro
      */
+    /*
     @GetMapping("/logout")
     public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
         Subject currentUser = SecurityUtils.getSubject();
         currentUser.logout();
         redirectAttributes.addFlashAttribute("message", "Sesión cerrada exitosamente");
         return "redirect:/login";
+    }*/
+
+    // Java
+    @GetMapping("/logout")
+    @ResponseBody
+    public String apiLogout() {
+        Subject currentUser = SecurityUtils.getSubject();
+        if (currentUser != null && currentUser.isAuthenticated()) {
+            System.out.println("🔐 LOGOUT: Usuario autenticado -> " + currentUser.getPrincipal());
+        } else {
+            System.out.println("🔐 LOGOUT: No había usuario autenticado");
+        }
+        try {
+            currentUser.logout();
+            System.out.println("✅ Subject.logout() ejecutado, sesión cerrada");
+        } catch (Exception e) {
+            System.out.println("❌ Error al cerrar sesión: " + e.getMessage());
+            return "ERROR: " + e.getMessage();
+        }
+        return "OK";
     }
+
 
     /**
      * Muestra el formulario de registro de usuarios - Parte 3
