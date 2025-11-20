@@ -43,9 +43,13 @@
                     <div class="text-center mb-4">
                         <h2><i class="fas fa-shield-alt text-primary"></i> Iniciar Sesión</h2>
                         <div class="shiro-badge">
-                            <i class="fas fa-lock"></i> Protegido por Apache Shiro
+                            <i class="fas fa-lock"></i> Protegido por Apache Shiro + DatabaseRealm
                         </div>
-                        <p class="text-muted">Taller Final - Parte 2</p>
+                        <p class="text-muted">Taller Final - Parte 3: Autenticación Segura</p>
+                        <small class="text-info">
+                            <i class="fas fa-database"></i> Base de datos +
+                            <i class="fas fa-key"></i> Hash BCrypt/Argon2/PBKDF2/SHA-512
+                        </small>
                     </div>
 
                     <!-- Mensajes de error o éxito -->
@@ -82,31 +86,48 @@
                         </div>
                     </form>
 
-                    <!-- Usuarios de prueba -->
+                    <!-- Registro de usuarios -->
+                    <div class="text-center mt-3">
+                        <p class="text-muted mb-2">¿No tienes cuenta?</p>
+                        <a href="/register" class="btn btn-outline-success">
+                            <i class="fas fa-user-plus"></i> Registrarse
+                        </a>
+                    </div>
+
+                    <!-- Usuarios de prueba - Parte 3 -->
                     <div class="mt-4">
-                        <h6 class="text-center text-muted">Usuarios de Prueba:</h6>
+                        <h6 class="text-center text-muted">Usuarios por Defecto (BD):</h6>
                         <div class="row text-center">
                             <div class="col-4">
                                 <small class="text-muted">
                                     <strong>admin</strong><br>
                                     admin123<br>
-                                    <span class="badge bg-danger">Admin</span>
+                                    <span class="badge bg-danger">Admin</span><br>
+                                    <span class="badge bg-secondary">BCrypt</span>
                                 </small>
                             </div>
                             <div class="col-4">
                                 <small class="text-muted">
                                     <strong>manager</strong><br>
                                     manager123<br>
-                                    <span class="badge bg-warning">Manager</span>
+                                    <span class="badge bg-warning">Manager</span><br>
+                                    <span class="badge bg-secondary">Argon2</span>
                                 </small>
                             </div>
                             <div class="col-4">
                                 <small class="text-muted">
-                                    <strong>user</strong><br>
-                                    user123<br>
-                                    <span class="badge bg-info">User</span>
+                                    <strong>demo</strong><br>
+                                    demo123<br>
+                                    <span class="badge bg-info">User</span><br>
+                                    <span class="badge bg-secondary">SHA-512</span>
                                 </small>
                             </div>
+                        </div>
+                        <div class="text-center mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> Usuarios creados automáticamente con diferentes
+                                algoritmos de hash
+                            </small>
                         </div>
                     </div>
                 </div>

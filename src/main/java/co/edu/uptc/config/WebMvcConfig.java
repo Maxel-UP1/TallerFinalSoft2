@@ -25,6 +25,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns( // EXCEPTO estas rutas públicas:
                         "/login", // Página de login
                         "/logout", // Logout
+                        "/register", // Registro de usuarios - Parte 3
+                        "/api/user-stats", // Estadísticas públicas - Parte 3
                         "/css/**", // Recursos CSS
                         "/js/**", // Recursos JS
                         "/images/**", // Imágenes

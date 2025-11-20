@@ -1,36 +1,42 @@
 package co.edu.uptc.config;
 
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.realm.text.IniRealm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuración de Apache Shiro como backend de autenticación
- * Se integra con Spring Boot 3 usando interceptors en lugar de filtros
+ * Configuración de Apache Shiro con Base de Datos - Parte 3
+ * Utiliza DatabaseRealm para autenticación segura con contraseñas hasheadas
  */
 @Configuration
 public class ShiroConfig {
 
+    @Autowired
+    private DatabaseRealm databaseRealm;
+
     /**
-     * Configura el Realm basado en archivo INI
+     * Configura el SessionManager para entorno web
      */
     @Bean
-    public IniRealm realm() {
-        System.out.println(" CONFIGURANDO Apache Shiro IniRealm");
-        IniRealm realm = new IniRealm("classpath:shiro.ini");
-        return realm;
+    public DefaultWebSessionManager sessionManager() {
+        DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+        sessionManager.setSessionIdCookieEnabled(true);
+        sessionManager.setSessionIdUrlRewritingEnabled(false);
+        return sessionManager;
     }
 
     /**
-     * Configura el SecurityManager de Shiro
+     * Configura el SecurityManager con DatabaseRealm y SessionManager web
      */
     @Bean
     public SecurityManager securityManager() {
-        System.out.println(" CONFIGURANDO Apache Shiro SecurityManager");
+        System.out.println("🔧 CONFIGURANDO Apache Shiro SecurityManager con DatabaseRealm");
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-        securityManager.setRealm(realm());
+        securityManager.setRealm(databaseRealm);
+        securityManager.setSessionManager(sessionManager());
         return securityManager;
     }
 }
