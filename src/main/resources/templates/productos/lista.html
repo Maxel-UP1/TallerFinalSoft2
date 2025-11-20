@@ -117,6 +117,31 @@
             </div>
         </div>
 
+        <!-- html -->
+        <!-- Insertar dentro del bloque de acciones (por ejemplo junto a "Nuevo Producto") -->
+        <div class="btn-group ms-2" role="group" aria-label="role-check">
+            <button id="btn-admin" class="btn btn-outline-primary btn-sm" type="button">Admin</button>
+            <button id="btn-manager" class="btn btn-outline-secondary btn-sm" type="button">Manager</button>
+            <button id="btn-usuario" class="btn btn-outline-success btn-sm" type="button">Usuario</button>
+        </div>
+
+        <script>
+            async function checkRole(role) {
+                try {
+                    const res = await fetch('/api/checkRole?role=' + encodeURIComponent(role));
+                    const text = await res.text();
+                    alert(text);
+                } catch (e) {
+                    alert('Error al comprobar rol');
+                }
+            }
+
+            document.getElementById('btn-admin').addEventListener('click', () => checkRole('admin'));
+            document.getElementById('btn-manager').addEventListener('click', () => checkRole('manager'));
+            document.getElementById('btn-usuario').addEventListener('click', () => checkRole('usuario'));
+        </script>
+
+
         <!-- Tabla de productos -->
         <div class="card">
             <div class="card-body">
